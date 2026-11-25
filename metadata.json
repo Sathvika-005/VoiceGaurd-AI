@@ -1,0 +1,10 @@
+{
+  "name": "Remix VoiceGuard AI",
+  "description": "WhatsApp-first and web voice-scam shield combining DetectifAI Aletheia deepfake detection with Gemini native audio scam analysis.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

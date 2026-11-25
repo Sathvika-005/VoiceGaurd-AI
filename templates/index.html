@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceGuard AI — Voice Scam & Deepfake Shield</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12a3 3 0 0 0 6 0"></path>
+            <line x1="12" y1="7" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div>
+          <h1>VoiceGuard AI</h1>
+          <p class="subtitle">Dual-Engine Voice Deepfake &amp; Scam Shield · Aletheia + Gemini</p>
+        </div>
+      </div>
+      <div class="topbar-meta">
+        <a class="docs-link" href="/docs" target="_blank" rel="noopener noreferrer">API Docs</a>
+      </div>
+    </header>
+
+    <aside class="privacy-notice" aria-label="Privacy notice">
+      <strong>Privacy by design:</strong> No database, no stored audio, and no saved transcripts. Uploaded or recorded audio is processed in temporary memory and deleted immediately after screening.
+    </aside>
+
+    <main class="workspace">
+      <!-- Input & Controls Panel -->
+      <section class="card input-card" aria-labelledby="input-heading">
+        <div class="card-header">
+          <h2 id="input-heading">Screen a Voice Note or Call Recording</h2>
+          <span class="hint-text">Minimum 4 s · Max 16 MB · WAV, MP3, M4A, FLAC, OGG, WebM</span>
+        </div>
+
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop an audio file here or click to browse">
+          <input id="file-input" type="file" accept="audio/*,.wav,.mp3,.m4a,.flac,.ogg,.webm,.aac,.amr" hidden />
+          <div class="dropzone-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <p class="dropzone-title">Drop suspicious audio here, or <span class="accent-link">browse files</span></p>
+          <p class="dropzone-sub">Long recordings (&gt;120 s) are automatically segmented into 100 s windows for Aletheia</p>
+        </div>
+
+        <div class="controls-row">
+          <div class="record-controls">
+            <button id="record-btn" type="button" class="btn btn-secondary">
+              <span class="rec-dot" aria-hidden="true"></span>
+              <span id="record-btn-label">Record Mic</span>
+            </button>
+            <span id="record-timer" class="mono timer-badge hidden">00:00</span>
+          </div>
+
+          <div class="lang-control">
+            <label for="language-select">Report language</label>
+            <select id="language-select">
+              <option value="en" selected>English</option>
+              <option value="auto">Auto (match audio)</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="kn">ಕನ್ನಡ (Kannada)</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+              <option value="te">తెలుగు (Telugu)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="file-preview" class="file-preview hidden">
+          <div class="file-preview-meta">
+            <div>
+              <div id="preview-filename" class="preview-name"></div>
+              <div id="preview-details" class="preview-sub mono"></div>
+            </div>
+            <button id="clear-btn" type="button" class="btn btn-ghost">Clear</button>
+          </div>
+          <audio id="audio-player" controls class="audio-player"></audio>
+        </div>
+
+        <div class="submit-row">
+          <button id="analyze-btn" type="button" class="btn btn-primary" disabled>
+            Analyse Audio
+          </button>
+          <span id="pipeline-status-text" class="status-text" aria-live="polite">Ready.</span>
+        </div>
+      </section>
+
+      <!-- Pipeline Stepper -->
+      <section id="stepper-section" class="card stepper-card hidden" aria-label="Analysis pipeline progress" aria-live="polite">
+        <div class="stepper">
+          <div id="step-validate" class="step" data-state="idle">
+            <span class="step-num">1</span>
+            <div>
+              <div class="step-title">Validate &amp; Probe</div>
+              <div class="step-meta" id="step-validate-meta">Waiting</div>
+            </div>
+          </div>
+          <div class="step-divider" aria-hidden="true"></div>
+          <div id="step-engines" class="step" data-state="idle">
+            <span class="step-num">2</span>
+            <div>
+              <div class="step-title">Aletheia ∥ Gemini</div>
+              <div class="step-meta" id="step-engines-meta">Parallel engines</div>
+            </div>
+          </div>
+          <div class="step-divider" aria-hidden="true"></div>
+          <div id="step-fusion" class="step" data-state="idle">
+            <span class="step-num">3</span>
+            <div>
+              <div class="step-title">Explainable Fusion</div>
+              <div class="step-meta" id="step-fusion-meta">Waiting</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Error Banner -->
+      <section id="error-banner" class="alert-banner alert-error hidden" role="alert">
+        <div class="alert-icon" aria-hidden="true">!</div>
+        <div>
+          <h3>Analysis Could Not Be Completed</h3>
+          <p id="error-message"></p>
+        </div>
+      </section>
+
+      <!-- Results Area -->
+      <section id="results-area" class="results-area hidden" aria-live="polite">
+        <!-- Combined Threat Banner -->
+        <div id="threat-banner" class="threat-banner" data-level="UNDETERMINED">
+          <div class="threat-main">
+            <div class="threat-badge" id="threat-badge">
+              <span id="threat-icon" class="threat-icon" aria-hidden="true">●</span>
+              <span id="threat-level-text">UNDETERMINED</span>
+            </div>
+            <h2 id="threat-headline" class="threat-headline">Awaiting assessment...</h2>
+            <p id="partial-banner" class="partial-banner hidden"></p>
+          </div>
+          <div class="threat-meta-col">
+            <div id="cache-badge" class="meta-chip hidden"></div>
+            <div id="timing-summary" class="meta-chip mono hidden"></div>
+          </div>
+        </div>
+
+        <!-- Dual-Engine Cards -->
+        <div class="engines-grid">
+          <!-- Aletheia Card -->
+          <article class="card engine-card" id="aletheia-card">
+            <div class="engine-header">
+              <div>
+                <span class="engine-kicker">VOICE AUTHENTICITY</span>
+                <h3>DetectifAI Aletheia</h3>
+              </div>
+              <span id="aletheia-timing" class="timing-pill mono">—</span>
+            </div>
+
+            <div id="aletheia-body" class="engine-body">
+              <p class="muted">Waiting for Aletheia...</p>
+            </div>
+
+            <div id="aletheia-timeline-wrap" class="timeline-wrap hidden">
+              <div class="timeline-header">
+                <span>Segment Authenticity Timeline</span>
+                <span id="aletheia-segment-count" class="mono"></span>
+              </div>
+              <div id="aletheia-timeline" class="timeline-bar" role="list"></div>
+              <div id="aletheia-timeline-legend" class="timeline-legend"></div>
+            </div>
+
+            <p id="aletheia-evidence-note" class="evidence-note hidden">
+              A detection score is evidence, not proof.
+            </p>
+          </article>
+
+          <!-- Gemini Card -->
+          <article class="card engine-card" id="gemini-card">
+            <div class="engine-header">
+              <div>
+                <span class="engine-kicker">COMMUNICATION RISK</span>
+                <h3>Gemini Native Audio</h3>
+              </div>
+              <span id="gemini-timing" class="timing-pill mono">—</span>
+            </div>
+
+            <div id="gemini-body" class="engine-body">
+              <p class="muted">Waiting for Gemini...</p>
+            </div>
+          </article>
+        </div>
+
+        <!-- Indicators List -->
+        <section id="indicators-card" class="card hidden">
+          <div class="card-header">
+            <h3>Detected Scam &amp; Manipulation Indicators</h3>
+            <span id="indicators-count" class="mono muted"></span>
+          </div>
+          <ul id="indicators-list" class="indicators-list"></ul>
+        </section>
+
+        <!-- Fusion Reasoning & Actions -->
+        <section id="fusion-details-card" class="card hidden">
+          <div class="fusion-cols">
+            <div>
+              <h3>Why This Rating (Explainable Fusion)</h3>
+              <ul id="fusion-reasons" class="bullet-list"></ul>
+            </div>
+            <div>
+              <h3>Recommended Actions</h3>
+              <ul id="fusion-actions" class="action-list"></ul>
+            </div>
+          </div>
+
+          <div class="report-toolbar no-print">
+            <button id="copy-summary-btn" type="button" class="btn btn-secondary">Copy Summary</button>
+            <button id="print-btn" type="button" class="btn btn-secondary">Print / Save as PDF</button>
+            <button id="download-json-btn" type="button" class="btn btn-secondary">Download JSON</button>
+            <span id="copy-feedback" class="copy-feedback" aria-live="polite"></span>
+          </div>
+
+          <p class="disclaimer-footer">
+            Automated assessment, not proof of fraud or voice cloning. Verify independently via official numbers or trusted contacts.
+          </p>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
