@@ -174,7 +174,7 @@ async def test_malformed_json_twice_returns_unavailable(tmp_path: Path) -> None:
 
 
 @pytest.mark.asyncio
-async def test_http_503_retries_twice_with_2s_backoff_then_falls_back_to_38_flash(
+async def test_http_503_retries_twice_with_2s_backoff_then_falls_back_to_configured_model(
     tmp_path: Path, monkeypatch
 ) -> None:
     audio = tmp_path / "sample.mp3"
@@ -212,7 +212,7 @@ async def test_http_503_retries_twice_with_2s_backoff_then_falls_back_to_38_flas
         "gemini-3.5-flash-lite",
         "gemini-3.5-flash-lite",
         "gemini-3.5-flash-lite",
-        "gemini-3.8-flash",
+        FALLBACK_GEMINI_MODEL,
     ]
     assert sleep_delays == [
         HTTP_503_BACKOFF_SECONDS,

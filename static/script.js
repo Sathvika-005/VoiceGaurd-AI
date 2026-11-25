@@ -14,6 +14,93 @@
   const clearBtn = document.getElementById("clear-btn");
   const analyzeBtn = document.getElementById("analyze-btn");
   const statusText = document.getElementById("pipeline-status-text");
+  const themeToggle = document.getElementById("theme-toggle");
+  const recordingVisual = document.getElementById("recording-visual");
+  const recordingCanvas = document.getElementById("recording-wave");
+  const recordingCanvasCtx = recordingCanvas.getContext("2d");
+  const recordStopBtn = document.getElementById("record-stop");
+  const recordingVisualNote = document.getElementById("recording-visual-note");
+
+  function setTheme(theme) {
+    document.body.dataset.theme = theme;
+    const isDark = theme === "dark";
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.innerHTML = isDark ? "☼ <span>Light mode</span>" : "☾ <span>Dark mode</span>";
+    try { localStorage.setItem("voiceguard-theme", theme); } catch { /* storage may be unavailable */ }
+  }
+  let savedTheme = "light";
+  try { savedTheme = localStorage.getItem("voiceguard-theme") || "light"; } catch { /* use default */ }
+  setTheme(savedTheme === "dark" ? "dark" : "light");
+  themeToggle.addEventListener("click", () => setTheme(document.body.dataset.theme === "dark" ? "light" : "dark"));
+
+  let waveformFrame = null;
+  function startWaveform(analyser) {
+    const samples = new Uint8Array(analyser.fftSize);
+    const draw = () => {
+      if (recordingVisual.classList.contains("hidden")) return;
+      const rect = recordingCanvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      const canvasWidth = Math.max(1, Math.floor(rect.width * ratio));
+      const canvasHeight = Math.max(1, Math.floor(rect.height * ratio));
+      if (recordingCanvas.width !== canvasWidth) recordingCanvas.width = canvasWidth;
+      if (recordingCanvas.height !== canvasHeight) recordingCanvas.height = canvasHeight;
+      recordingCanvasCtx.clearRect(0, 0, recordingCanvas.width, recordingCanvas.height);
+      analyser.getByteTimeDomainData(samples);
+      const size = Math.min(recordingCanvas.width, recordingCanvas.height);
+      const centerX = recordingCanvas.width / 2;
+      const centerY = recordingCanvas.height / 2;
+      const baseRadius = size * 0.29;
+      const pointStride = Math.max(1, Math.floor(samples.length / 360));
+      recordingCanvasCtx.lineWidth = 2.4 * ratio;
+      recordingCanvasCtx.lineJoin = "round";
+      recordingCanvasCtx.strokeStyle = "#a9f0ff";
+      recordingCanvasCtx.shadowColor = "#52baff";
+      recordingCanvasCtx.shadowBlur = 15 * ratio;
+      recordingCanvasCtx.beginPath();
+      let pointIndex = 0;
+      for (let index = 0; index < samples.length; index += pointStride) {
+        const angle = (index / samples.length) * Math.PI * 2 - Math.PI / 2;
+        const inputAmplitude = (samples[index] - 128) / 128;
+        const radius = Math.max(size * 0.2, baseRadius + inputAmplitude * size * 0.27);
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+        if (pointIndex === 0) recordingCanvasCtx.moveTo(x, y); else recordingCanvasCtx.lineTo(x, y);
+        pointIndex += 1;
+      }
+      recordingCanvasCtx.closePath();
+      recordingCanvasCtx.stroke();
+      waveformFrame = requestAnimationFrame(draw);
+    };
+    draw();
+  }
+
+  function beginRecordingUi(analyser) {
+    recordingVisual.classList.add("is-immersive");
+    recordingVisual.classList.remove("hidden");
+    recordingVisualNote.textContent = analyser
+      ? "Live microphone level · speak to see your waveform"
+      : "Live waveform is unavailable in this browser; recording continues.";
+    if (analyser) startWaveform(analyser);
+    recordStartMs = Date.now();
+    recordTimer.textContent = "00:00";
+    recordTimer.classList.remove("hidden");
+    recordBtn.classList.add("recording");
+    recordBtnLabel.textContent = "Stop Recording";
+    recordTimerId = setInterval(() => {
+      const elapsed = formatSeconds((Date.now() - recordStartMs) / 1000);
+      recordTimer.textContent = elapsed;
+    }, 250);
+    document.body.classList.add("voice-recording-active");
+    recordStopBtn.focus({ preventScroll: true });
+  }
+  function stopWaveform() {
+    if (waveformFrame !== null) cancelAnimationFrame(waveformFrame);
+    waveformFrame = null;
+    recordingVisual.classList.add("hidden");
+    recordingVisual.classList.remove("is-immersive");
+    document.body.classList.remove("voice-recording-active");
+    recordBtn.focus({ preventScroll: true });
+  }
 
   const stepperSection = document.getElementById("stepper-section");
   const stepValidate = document.getElementById("step-validate");
@@ -635,6 +722,19 @@
 
   analyzeBtn.addEventListener("click", runAnalysis);
 
+  recordStopBtn.addEventListener("click", async () => {
+    if (activeRecState) await activeRecState.stop();
+  });
+  recordingVisual.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (activeRecState) activeRecState.stop();
+    } else if (event.key === "Tab") {
+      event.preventDefault();
+      recordStopBtn.focus();
+    }
+  });
+
   // In-browser WAV microphone recorder (avoids Chrome MediaRecorder WebM missing duration metadata)
   recordBtn.addEventListener("click", async () => {
     if (activeRecState) {
@@ -661,22 +761,27 @@
       recordBtn.classList.remove("recording");
       recordBtnLabel.textContent = "Record Mic";
       recordTimer.classList.add("hidden");
+      stopWaveform();
       activeRecState = null;
     };
 
     if (AudioCtx && typeof AudioCtx.prototype.createScriptProcessor === "function") {
+      let audioCtx = null;
       try {
-        const audioCtx = new AudioCtx();
+        audioCtx = new AudioCtx();
         if (audioCtx.state === "suspended") {
           await audioCtx.resume();
         }
         const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 1024;
         const processor = audioCtx.createScriptProcessor(4096, 1, 1);
         const muteGain = audioCtx.createGain();
         muteGain.gain.value = 0;
 
         const pcmChunks = [];
         let recordingActive = true;
+        let cleaned = false;
 
         processor.onaudioprocess = (event) => {
           if (!recordingActive) return;
@@ -685,20 +790,29 @@
         };
 
         source.connect(processor);
+        source.connect(analyser);
+        // Keep the analyser pulled by the audio graph while keeping its output silent.
+        analyser.connect(muteGain);
         processor.connect(muteGain);
         muteGain.connect(audioCtx.destination);
 
+        const cleanup = async () => {
+          if (cleaned) return;
+          cleaned = true;
+          recordingActive = false;
+          finishUiReset();
+          processor.disconnect();
+          analyser.disconnect();
+          source.disconnect();
+          muteGain.disconnect();
+          stream.getTracks().forEach((t) => t.stop());
+          await audioCtx.close().catch(() => {});
+        };
+
         activeRecState = {
           stop: async () => {
-            recordingActive = false;
-            finishUiReset();
-            processor.disconnect();
-            source.disconnect();
-            muteGain.disconnect();
-            stream.getTracks().forEach((t) => t.stop());
-
             const sampleRate = audioCtx.sampleRate || 44100;
-            await audioCtx.close().catch(() => {});
+            await cleanup();
 
             const merged = mergeFloat32Chunks(pcmChunks);
             const wavBuffer = encodeWav(merged, sampleRate);
@@ -706,19 +820,15 @@
             const recordedFile = new File([wavBlob], "mic-recording.wav", { type: "audio/wav" });
             setSelectedFile(recordedFile);
           },
+          cancel: cleanup,
         };
 
-        recordStartMs = Date.now();
-        recordTimer.textContent = "00:00";
-        recordTimer.classList.remove("hidden");
-        recordBtn.classList.add("recording");
-        recordBtnLabel.textContent = "Stop Recording";
-        recordTimerId = setInterval(() => {
-          recordTimer.textContent = formatSeconds((Date.now() - recordStartMs) / 1000);
-        }, 250);
+        beginRecordingUi(analyser);
         return;
       } catch {
         stream.getTracks().forEach((t) => t.stop());
+        if (audioCtx) await audioCtx.close().catch(() => {});
+        finishUiReset();
         showError("Unable to initialize microphone audio encoder.");
         return;
       }
@@ -730,6 +840,12 @@
       showError("In-browser microphone recording is not supported in this browser.");
       return;
     }
+    let fallbackCtx = null;
+    let fallbackAnalyser = null;
+    let fallbackMute = null;
+    let fallbackSource = null;
+    let cancelled = false;
+    let captureCleaned = false;
     try {
       const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
         ? "audio/webm;codecs=opus"
@@ -740,13 +856,45 @@
       const mediaRecorder = mimeType
         ? new MediaRecorder(stream, { mimeType })
         : new MediaRecorder(stream);
+      if (AudioCtx) {
+        try {
+          fallbackCtx = new AudioCtx();
+          if (fallbackCtx.state === "suspended") await fallbackCtx.resume();
+          fallbackSource = fallbackCtx.createMediaStreamSource(stream);
+          fallbackAnalyser = fallbackCtx.createAnalyser();
+          fallbackMute = fallbackCtx.createGain();
+          fallbackMute.gain.value = 0;
+          fallbackAnalyser.fftSize = 1024;
+          fallbackSource.connect(fallbackAnalyser);
+          // Pull analyser samples through a silent path, without monitoring the microphone.
+          fallbackAnalyser.connect(fallbackMute);
+          fallbackMute.connect(fallbackCtx.destination);
+        } catch {
+          if (fallbackCtx) await fallbackCtx.close().catch(() => {});
+          fallbackCtx = null;
+          fallbackSource = null;
+          fallbackAnalyser = null;
+          fallbackMute = null;
+        }
+      }
+
+      const cleanupFallback = async () => {
+        if (captureCleaned) return;
+        captureCleaned = true;
+        finishUiReset();
+        stream.getTracks().forEach((t) => t.stop());
+        if (fallbackSource) fallbackSource.disconnect();
+        if (fallbackAnalyser) fallbackAnalyser.disconnect();
+        if (fallbackMute) fallbackMute.disconnect();
+        if (fallbackCtx) await fallbackCtx.close().catch(() => {});
+      };
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) recordChunks.push(e.data);
       };
       mediaRecorder.onstop = async () => {
-        finishUiReset();
-        stream.getTracks().forEach((t) => t.stop());
+        await cleanupFallback();
+        if (cancelled) return;
 
         const blobType = mediaRecorder.mimeType || "audio/webm";
         const rawBlob = new Blob(recordChunks, { type: blobType });
@@ -767,6 +915,12 @@
         const ext = blobType.includes("ogg") ? "ogg" : "webm";
         setSelectedFile(new File([rawBlob], `mic-recording.${ext}`, { type: blobType }));
       };
+      mediaRecorder.onerror = () => {
+        cancelled = true;
+        if (activeRecState) activeRecState.cancel();
+        else cleanupFallback();
+        showError("The browser stopped recording because of an audio capture error. Please try again.");
+      };
 
       activeRecState = {
         stop: async () => {
@@ -774,21 +928,28 @@
             mediaRecorder.stop();
           }
         },
+        cancel: () => {
+          cancelled = true;
+          if (mediaRecorder.state !== "inactive") mediaRecorder.stop();
+          return cleanupFallback();
+        },
       };
 
       mediaRecorder.start(250);
-      recordStartMs = Date.now();
-      recordTimer.textContent = "00:00";
-      recordTimer.classList.remove("hidden");
-      recordBtn.classList.add("recording");
-      recordBtnLabel.textContent = "Stop Recording";
-      recordTimerId = setInterval(() => {
-        recordTimer.textContent = formatSeconds((Date.now() - recordStartMs) / 1000);
-      }, 250);
+      beginRecordingUi(fallbackAnalyser);
     } catch {
       stream.getTracks().forEach((t) => t.stop());
+      if (fallbackSource) fallbackSource.disconnect();
+      if (fallbackAnalyser) fallbackAnalyser.disconnect();
+      if (fallbackMute) fallbackMute.disconnect();
+      if (fallbackCtx) await fallbackCtx.close().catch(() => {});
+      finishUiReset();
       showError("Unable to start microphone recording.");
     }
+  });
+
+  window.addEventListener("pagehide", () => {
+    if (activeRecState && typeof activeRecState.cancel === "function") activeRecState.cancel();
   });
 
   copySummaryBtn.addEventListener("click", async () => {

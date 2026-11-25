@@ -8,27 +8,24 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            <path d="M9 12a3 3 0 0 0 6 0"></path>
-            <line x1="12" y1="7" x2="12" y2="12"></line>
-          </svg>
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="hero-eyebrow">TRUST YOUR INSTINCTS · VERIFY THE VOICE</p>
+      <div class="hero-heading-row">
+        <div class="hero-brand">
+          <span class="hero-logo" role="img" aria-label="VoiceGuard shield"></span>
+          <h2 id="hero-title">VoiceGuard <span>AI</span></h2>
         </div>
-        <div>
-          <h1>VoiceGuard AI</h1>
-          <p class="subtitle">Dual-Engine Voice Deepfake &amp; Scam Shield · Aletheia + Gemini</p>
+        <div class="hero-actions">
+          <a class="docs-link" href="/docs" target="_blank" rel="noopener noreferrer">API Docs</a>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">☾ <span>Dark mode</span></button>
         </div>
       </div>
-      <div class="topbar-meta">
-        <a class="docs-link" href="/docs" target="_blank" rel="noopener noreferrer">API Docs</a>
-      </div>
-    </header>
+      <p class="hero-subtitle">Dual-Engine Voice Deepfake &amp; Scam Shield · Aletheia + Gemini</p>
+      <small class="hero-note">Pause first. Verify independently.</small>
+    </section>
 
     <aside class="privacy-notice" aria-label="Privacy notice">
-      <strong>Privacy by design:</strong> No database, no stored audio, and no saved transcripts. Uploaded or recorded audio is processed in temporary memory and deleted immediately after screening.
+      <strong>Privacy:</strong> Audio is uploaded to this service for analysis and held in temporary server storage during processing. Gemini may also receive the audio for analysis; provider handling is subject to its policies. The app removes its temporary files when processing ends.
     </aside>
 
     <main class="workspace">
@@ -58,7 +55,6 @@
               <span class="rec-dot" aria-hidden="true"></span>
               <span id="record-btn-label">Record Mic</span>
             </button>
-            <span id="record-timer" class="mono timer-badge hidden">00:00</span>
           </div>
 
           <div class="lang-control">
@@ -73,6 +69,30 @@
             </select>
           </div>
         </div>
+
+        <section id="recording-visual" class="recording-visual hidden" role="dialog" aria-modal="true" aria-labelledby="recording-title" tabindex="-1">
+          <div class="recording-image" aria-hidden="true"></div>
+          <div class="recording-content">
+            <div class="recording-topbar">
+              <span class="recording-live" role="status"><i></i> RECORDING</span>
+              <div class="recording-clock"><span>ELAPSED</span><span id="record-timer" class="mono" role="timer" aria-label="Elapsed recording time">00:00</span></div>
+            </div>
+            <div class="recording-center">
+              <div class="recording-orb" aria-hidden="true">
+                <div class="recording-orb-core"></div>
+                <canvas id="recording-wave"></canvas>
+              </div>
+              <div class="recording-copy">
+                <h2 id="recording-title">Recording in progress</h2>
+                <p id="recording-visual-note">Live mic waveform · speak to see your voice</p>
+              </div>
+            </div>
+            <div class="recording-bottom">
+              <p>Your recording stays here until you choose to analyse it.</p>
+              <button id="record-stop" type="button" class="record-stop-button"><span aria-hidden="true">■</span> Stop recording</button>
+            </div>
+          </div>
+        </section>
 
         <div id="file-preview" class="file-preview hidden">
           <div class="file-preview-meta">

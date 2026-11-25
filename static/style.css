@@ -960,3 +960,121 @@ select,
   .card, .input-card { padding: 17px; }
   .dropzone { padding: 26px 14px; }
 }
+
+/* VoiceGuard branded experience */
+.brand-mark.brand-logo { background: #111c31 url("assets/voiceguard-logo.jpg") center / 300% auto no-repeat; border-color: #38577a; color: transparent; overflow: hidden; }
+.topbar-meta { display:flex; align-items:center; gap:10px; }
+.theme-toggle { min-height:36px; padding:0 12px; border:1px solid var(--border); border-radius:11px; background:var(--bg-elevated); color:var(--text); cursor:pointer; }
+.theme-toggle:hover { border-color:var(--accent); }
+.theme-toggle:focus-visible, button:focus-visible, select:focus-visible, a:focus-visible { outline:3px solid #55baff; outline-offset:2px; }
+.hero { margin:0 0 18px; padding:27px 30px; min-height:185px; border:1px solid #274d78; border-radius:16px; color:#f3f7ff; background:linear-gradient(90deg,#071326f2 0%,#071326c9 48%,#07132666 100%),url("assets/voiceguard-header.jpg") center 48% / cover no-repeat; box-shadow:0 12px 32px #102a4924; }
+.hero-eyebrow { margin:0 0 10px; color:#89caff; font:700 .72rem var(--font-mono); letter-spacing:.11em; }
+.hero h2 { margin:0 0 5px; font-size:clamp(2rem,4vw,3rem); letter-spacing:-.045em; }
+.hero h2 span { color:#6bc9ff; }
+.hero p:not(.hero-eyebrow) { margin:0; color:#d5e3f4; font-size:.98rem; }
+.hero small { display:block; margin-top:9px; color:#aebed2; }
+.recording-image { z-index:0; }
+.recording-visual canvas { z-index:1; }
+.recording-overlay, .recording-visual > p { z-index:2; }
+.privacy-notice { line-height:1.6; }
+body[data-theme="dark"] { --bg:#080d1a; --bg-elevated:#0f172a; --bg-panel:#131d33; --border:#233252; --border-strong:#334873; --text:#eef2ff; --text-muted:#a6b4c9; --accent:#57d994; --accent-dim:rgba(87,217,148,.14); --accent-hover:#36c47a; --low:#48d58e; --low-bg:rgba(72,213,142,.14); --medium:#f0c45e; --medium-bg:rgba(240,196,94,.14); --high:#ff986e; --high-bg:rgba(255,152,110,.16); --critical:#ff747b; --critical-bg:rgba(255,116,123,.18); --undetermined:#a6b4c9; --undetermined-bg:rgba(166,180,201,.14); color-scheme:dark; background:radial-gradient(ellipse at 8% 0%,rgba(50,113,194,.16),transparent 35rem),var(--bg); }
+body[data-theme="dark"] .privacy-notice { background:#10251f; border-color:#28533f; color:#c5ded3; }
+body[data-theme="dark"] .dropzone { background:linear-gradient(145deg,#121e33,#101b2c); }
+body[data-theme="dark"] .dropzone:hover, body[data-theme="dark"] .dropzone:focus-visible, body[data-theme="dark"] .dropzone.drag-over, body[data-theme="dark"] .step[data-state="active"] { background:#142b2b; }
+body[data-theme="dark"] .step[data-state="error"] { background:#352026; }
+body[data-theme="dark"] .alert-error { background:#351f27; }
+body[data-theme="dark"] .threat-banner { background:#172131; }
+body[data-theme="dark"] .threat-banner[data-level="LOW"] { background:#11281f; }
+body[data-theme="dark"] .threat-banner[data-level="MEDIUM"] { background:#302a19; }
+body[data-theme="dark"] .threat-banner[data-level="HIGH"], body[data-theme="dark"] .threat-banner[data-level="CRITICAL"] { background:#321e22; }
+body[data-theme="dark"] .theme-toggle { color:var(--text); }
+body[data-theme="light"] { color-scheme:light; }
+@media(max-width:600px) { .topbar { align-items:center; } .topbar-meta { gap:6px; } .theme-toggle { padding:0 8px; font-size:.82rem; } .theme-toggle span { display:none; } .hero { min-height:165px; padding:22px 18px; background-position:center,58% center; } .hero p:not(.hero-eyebrow) { max-width:28ch; } }
+
+/* Keep the brand identity and theme control together in one hero panel. */
+.topbar { justify-content:flex-end; min-height:48px; margin-bottom:12px; }
+.hero { min-height:unset; padding:25px 30px 24px; }
+.hero-heading-row { display:flex; align-items:center; justify-content:space-between; gap:18px; }
+.hero-brand { display:flex; align-items:center; gap:15px; min-width:0; }
+.hero-logo { flex:none; width:58px; height:58px; border:1px solid #5aa4dc88; border-radius:16px; background:#101a2e url("assets/voiceguard-logo.jpg") center / 300% auto no-repeat; box-shadow:0 0 24px #39a9ff24; }
+.hero h2 { margin:0; font-size:clamp(2rem,4vw,3rem); line-height:1.1; }
+.hero-subtitle { margin:11px 0 0!important; padding-left:73px; color:#d5e3f4; font-size:1rem; }
+.hero-note { margin-left:73px; }
+.hero .theme-toggle { flex:none; border-color:#80b4e766; background:#09182bbd; color:#f3f7ff; min-height:42px; padding:0 15px; }
+.hero .theme-toggle:hover { border-color:#72c7ff; background:#102544e8; }
+.privacy-notice { margin:0 0 18px; }
+@media(max-width:600px) {
+  .topbar { min-height:38px; margin-bottom:8px; }
+  .hero { padding:20px 17px; }
+  .hero-heading-row { align-items:flex-start; gap:10px; }
+  .hero-brand { gap:10px; }
+  .hero-logo { width:44px; height:44px; border-radius:12px; }
+  .hero h2 { font-size:clamp(1.7rem,8vw,2.3rem); }
+  .hero .theme-toggle { min-height:36px; padding:0 9px; }
+  .hero .theme-toggle span { display:inline; }
+  .hero-subtitle, .hero-note { margin-left:54px!important; padding-left:0; }
+  .hero-subtitle { font-size:.88rem!important; }
+  .hero-note { display:block; }
+}
+.topbar { display:none; }
+.hero-actions { display:flex; align-items:center; gap:9px; flex:none; }
+.hero .docs-link { display:inline-flex; align-items:center; min-height:42px; padding:0 13px; background:#09182bbd; border-color:#80b4e766; color:#e8f2ff; }
+.hero .docs-link:hover { border-color:#72c7ff; color:#fff; }
+@media(max-width:600px) { .hero-actions { flex-direction:column; align-items:stretch; gap:7px; } .hero .theme-toggle, .hero .docs-link { min-height:34px; font-size:.75rem; } }
+
+/* Immersive microphone recording mode */
+body.voice-recording-active { overflow:hidden; }
+.recording-visual.is-immersive {
+  position:fixed; inset:0; z-index:10000; width:100vw; height:100vh; height:100dvh; margin:0; padding:clamp(20px,5vh,56px) clamp(18px,5vw,76px);
+  display:flex; align-items:stretch; justify-content:center; overflow:hidden; isolation:isolate;
+  color:#f3f8ff; background:#050b19; border:0; border-radius:0;
+}
+.recording-visual.is-immersive::before {
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 48%,#0c2864aa 0%,#08152f70 36%,#030817d9 100%);
+}
+.recording-visual.is-immersive .recording-image {
+  position:absolute; inset:-3%; z-index:-1; background-image:linear-gradient(90deg,#040a19a8,#06102c62 48%,#040918a8),url("assets/voiceguard-recording.jpg");
+  background-size:cover; background-position:center; opacity:.8; transform:scale(1.04); animation:recording-art-drift 8s ease-in-out infinite alternate;
+}
+.recording-content { position:relative; z-index:2; width:min(100%,1000px); min-height:100%; margin:auto; display:grid; grid-template-rows:auto 1fr auto; }
+.recording-topbar,.recording-bottom { display:flex; align-items:center; justify-content:space-between; gap:18px; }
+.recording-topbar { padding-bottom:18px; border-bottom:1px solid #9ec9ff26; }
+.recording-live { display:flex; align-items:center; gap:11px; color:#ffedf0; font:800 .9rem var(--font-mono); letter-spacing:.16em; text-shadow:0 0 20px #ff425988; }
+.recording-live i { width:11px; height:11px; border-radius:50%; background:#ff496e; box-shadow:0 0 0 0 #ff496e66; animation:record-dot 1.4s ease-out infinite; }
+.recording-clock { display:grid; justify-items:end; gap:2px; }
+.recording-clock>span:first-child { color:#a8bfde; font:700 .65rem var(--font-mono); letter-spacing:.18em; }
+.recording-clock .mono { color:#fff; font:600 clamp(1.15rem,2.6vw,1.65rem) var(--font-mono); letter-spacing:.08em; font-variant-numeric:tabular-nums; }
+.recording-center { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(12px,3vh,30px); text-align:center; padding:14px 0; }
+.recording-orb { position:relative; display:grid; place-items:center; width:min(54vh,72vw,500px); width:min(54dvh,72vw,500px); aspect-ratio:1; isolation:isolate; }
+.recording-orb::before,.recording-orb::after { content:""; position:absolute; border-radius:50%; border:1px solid #6ecbff72; box-shadow:0 0 35px #288dff20,inset 0 0 35px #3286ff16; animation:orb-breathe 3.2s ease-in-out infinite alternate; }
+.recording-orb::before { inset:8%; }
+.recording-orb::after { inset:17%; border-color:#a184ff55; animation-delay:-1.6s; }
+.recording-orb-core { position:absolute; width:38%; aspect-ratio:1; border:1px solid #81ddffab; border-radius:50%; background:radial-gradient(circle at 38% 34%,#72dcff5c,#3274ef39 45%,#31278055 76%,#101c4144); box-shadow:0 0 40px #3ba8ff59,0 0 95px #4655ff39,inset 0 0 35px #8be2ff36; animation:core-glow 2.6s ease-in-out infinite alternate; }
+#recording-wave { position:absolute; inset:0; width:100%; height:100%; z-index:2; }
+.recording-copy h2 { margin:0; color:#f6f9ff; font-size:clamp(1.35rem,3vw,2rem); letter-spacing:-.03em; }
+.recording-copy p { margin:7px 0 0; color:#b8c9e3; font-size:clamp(.9rem,1.6vw,1.02rem); }
+.recording-bottom { padding-top:19px; border-top:1px solid #9ec9ff26; }
+.recording-bottom p { margin:0; color:#b8c9e3; font-size:.88rem; }
+.record-stop-button { min-height:52px; padding:0 25px; border:1px solid #ff7281b0; border-radius:15px; background:linear-gradient(135deg,#f04459,#c92e56); color:#fff; font:750 1rem var(--font-sans); box-shadow:0 10px 32px #db315047; cursor:pointer; transition:transform .18s ease,box-shadow .18s ease,filter .18s ease; }
+.record-stop-button span { margin-right:7px; font-size:.8rem; }
+.record-stop-button:hover { transform:translateY(-2px); filter:brightness(1.08); box-shadow:0 14px 40px #db315066; }
+.record-stop-button:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+@keyframes orb-breathe { from { transform:scale(.94); opacity:.52; } to { transform:scale(1.06); opacity:1; } }
+@keyframes core-glow { from { transform:scale(.94); filter:brightness(.9); } to { transform:scale(1.06); filter:brightness(1.25); } }
+@keyframes record-dot { 0% { box-shadow:0 0 0 0 #ff496e77; } 70%,100% { box-shadow:0 0 0 11px #ff496e00; } }
+@keyframes recording-art-drift { from { transform:scale(1.04) translateY(-5px); } to { transform:scale(1.07) translateY(5px); } }
+@media(max-width:650px) {
+  .recording-visual.is-immersive { padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom)); }
+  .recording-content { width:100%; }
+  .recording-topbar { padding-bottom:13px; }
+  .recording-live { font-size:.75rem; letter-spacing:.12em; }
+  .recording-live i { width:9px; height:9px; }
+  .recording-orb { width:min(58vh,82vw,420px); width:min(58dvh,82vw,420px); }
+  .recording-bottom { flex-direction:column; justify-content:center; padding-top:14px; text-align:center; }
+  .record-stop-button { width:min(100%,360px); min-height:54px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .recording-visual.is-immersive .recording-image,.recording-orb::before,.recording-orb::after,.recording-orb-core,.recording-live i { animation:none!important; }
+  .record-stop-button { transition:none; }
+}

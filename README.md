@@ -2,6 +2,8 @@
 
 **CMRIT × DetectifAI Hackathon — Track 1: Scam Shield**
 
+**Live demo:** [voiceguard-ai-demo.onrender.com](https://voiceguard-ai-demo.onrender.com)
+
 VoiceGuard AI is a **WhatsApp-first and web voice-scam shield** built to protect everyday users—especially families and seniors in India—from AI voice-cloning scams, "digital arrest" intimidation, UPI collect frauds, and OTP/KYC phishing.
 
 Forward a suspicious voice note or call recording to the WhatsApp bot (or upload/record directly in the browser UI) and receive a plain-language security report powered by two independent AI engines running in parallel:
