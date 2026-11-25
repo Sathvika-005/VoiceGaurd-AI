@@ -10,14 +10,6 @@ services:
         sync: false
       - key: DETECTIF_API_KEY
         sync: false
-      - key: WHATSAPP_ACCESS_TOKEN
-        sync: false
-      - key: WHATSAPP_PHONE_NUMBER_ID
-        sync: false
-      - key: WHATSAPP_VERIFY_TOKEN
-        sync: false
-      - key: WHATSAPP_APP_SECRET
-        sync: false
       - key: META_GRAPH_API_VERSION
         value: v25.0
       - key: MAX_UPLOAD_MB

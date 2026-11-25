@@ -156,8 +156,8 @@ This activates `.venv`, starts Uvicorn on port `8000`, and launches `cloudflared
 
 This repository includes a Docker image with Python, FFmpeg, and FFprobe, plus a Render Blueprint. To deploy it:
 
-1. Push this folder to a GitHub repository you control (the provided project folder currently has no Git remote).
-2. In Render, create a new **Blueprint** from that repository and provide `GEMINI_API_KEY` and `DETECTIF_API_KEY` when prompted. Add the `WHATSAPP_*` values if you want the bot online.
+1. In Render, create a new **Blueprint** from this GitHub repository and provide `GEMINI_API_KEY` and `DETECTIF_API_KEY` when prompted.
+2. Add the optional `WHATSAPP_*` values in the Render service's Environment settings when Meta credentials are available.
 3. After deploy, check `/health`. It reports which integrations have credentials configured.
 4. In Meta Developer Console, register `https://<your-render-host>/webhook` as the callback URL, use the same `WHATSAPP_VERIFY_TOKEN`, and subscribe to `messages`.
 
