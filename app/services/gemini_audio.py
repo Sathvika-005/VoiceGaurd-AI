@@ -257,7 +257,7 @@ def parse_and_guard_gemini_json(
     return apply_post_validation_guards(parsed)
 
 
-FALLBACK_GEMINI_MODEL = "gemini-3.8-flash"
+FALLBACK_GEMINI_MODEL = "gemini-3.6-flash"
 HTTP_503_BACKOFF_SECONDS = 2.0
 
 
@@ -269,7 +269,7 @@ class GeminiAudioClient:
         *,
         api_key: str,
         model: str = FALLBACK_GEMINI_MODEL,
-        timeout_seconds: float = 13.0,
+        timeout_seconds: float = 30.0,
         max_retries: int = 2,
         debug_raw_responses: bool = False,
         generate_fn: Callable[..., Awaitable[str]] | None = None,

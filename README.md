@@ -83,7 +83,7 @@ You can start the server and open the Web UI with **zero credentials** (`/health
    - Sign in to the DetectifAI platform (`https://platform.detectif.ai`) / hackathon developer portal and generate an API key.
 2. **Google Gemini API Key (`GEMINI_API_KEY`)**
    - Open [Google AI Studio](https://aistudio.google.com), click **Get API key**, and create a key.
-   - Default model in `.env.example` is `gemini-3.8-flash` (verified 2026-11-24; `gemini-3.5-flash-lite` is a lightweight alternative).
+   - Default model in `.env.example` is `gemini-3.8-flash`; Gemini 3.6 Flash is used as a temporary fallback during persistent service errors.
 3. **Meta WhatsApp Cloud API (`WHATSAPP_*`, optional for web-only testing)**
    - Go to [Meta for Developers](https://developers.facebook.com/) → **Create App** → **Other** → **Business** → add the **WhatsApp** product.
    - Open **WhatsApp → API Setup**:
@@ -125,6 +125,8 @@ python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 Open `http://localhost:8000` in your browser (or `http://localhost:8000/docs` for interactive OpenAPI docs, `http://localhost:8000/health` for integration status).
 
+For a platform-style start command, use `npm start`. The included `run.py` listens on the `PORT` environment variable (default `3000`), as expected by container hosts.
+
 ### Option B: Web UI + WhatsApp Quick Tunnel (two windows)
 
 ```powershell
@@ -147,6 +149,27 @@ This activates `.venv`, starts Uvicorn on port `8000`, and launches `cloudflared
 4. Send `hi` from your whitelisted WhatsApp number to your Meta test number—you should receive the welcome and privacy notice, then forward any voice note (>= 4 seconds)!
 
 > **Important:** Cloudflare Quick Tunnel generates a **new URL every time you restart it**, so update the Callback URL in Meta Developer Console each session.
+
+---
+
+## Deploying for a Demo
+
+This repository includes a Docker image with Python, FFmpeg, and FFprobe, plus a Render Blueprint. To deploy it:
+
+1. In Render, create a new **Blueprint** from this GitHub repository and provide `GEMINI_API_KEY` and `DETECTIF_API_KEY` when prompted.
+2. Add the optional `WHATSAPP_*` values in the Render service's Environment settings when Meta credentials are available.
+3. After deploy, check `/health`. It reports which integrations have credentials configured.
+4. In Meta Developer Console, register `https://<your-render-host>/webhook` as the callback URL, use the same `WHATSAPP_VERIFY_TOKEN`, and subscribe to `messages`.
+
+The free Render plan can sleep when idle, so open the site once before the demo. For always-on use, choose a paid instance. The container can also be deployed to Google Cloud Run with the same environment variables.
+
+### Keeping Google AI Studio handoff intact
+
+Keep the GitHub copy as the shared source and use AI Studio's **Import from GitHub** / GitHub sync to share code with your teammate. This project is a FastAPI/Python service and needs FFmpeg at runtime; AI Studio Build apps use a Node.js runtime, so its one-click preview/publish is not a reliable deployment path for this backend. Deploy the included Docker image for the live demo, and keep AI Studio for source review and collaboration. Do not put API keys in the repository; add them as hosting secrets.
+
+### WhatsApp activation requirements
+
+The webhook and reply bot are implemented, but the bot cannot receive messages until Meta credentials are added to the host and Meta is pointed at the public `/webhook` URL. Supply a WhatsApp Cloud API access token, phone number ID, verify token, and Meta app secret. Then verify the callback and enable the `messages` subscription in Meta. `/health` shows whether the required token and phone number ID are configured.
 
 ---
 

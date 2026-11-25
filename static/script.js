@@ -452,7 +452,8 @@
     formData.append("file", selectedFile);
     formData.append("language", langSelect.value);
 
-    const ENGINE_TIMEOUT_MS = 15000;
+    // Gemini may need a full model timeout before it can emit its first retry update.
+    const ENGINE_TIMEOUT_MS = 90000;
     const controller = new AbortController();
     let timeoutId = null;
     const resetAbortTimer = () => {
@@ -562,14 +563,14 @@
     } catch (err) {
       const isTimeout = err && err.name === "AbortError";
       const errMsg = isTimeout
-        ? "Analysis request timed out after 15 seconds."
+        ? "Analysis took too long without an update. Please try again with a shorter or clearer recording."
         : "Network error while streaming analysis results.";
-      setStep(stepEngines, stepEnginesMeta, "error", isTimeout ? "Timed out (15 s)" : "Network error");
+      setStep(stepEngines, stepEnginesMeta, "error", isTimeout ? "Timed out (90 s)" : "Network error");
       if (!aletheiaDone) {
-        renderAletheia({ status: "unavailable", elapsed_ms: 15000, error_message: errMsg });
+        renderAletheia({ status: "unavailable", elapsed_ms: 90000, error_message: errMsg });
       }
       if (!geminiDone) {
-        renderGemini({ status: "unavailable", elapsed_ms: 15000, error_message: errMsg });
+        renderGemini({ status: "unavailable", elapsed_ms: 90000, error_message: errMsg });
       }
       showError(errMsg);
     } finally {

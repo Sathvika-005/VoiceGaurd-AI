@@ -477,7 +477,7 @@ def prepare_gemini_audio_sync(source_path: Path, work_dir: Path) -> tuple[Path, 
         "-c:a",
         "libmp3lame",
         "-b:a",
-        "32k",
+        "64k",
         str(out_mp3),
     ]
     proc = subprocess.run(cmd_mp3, capture_output=True, text=True, timeout=120, check=False)

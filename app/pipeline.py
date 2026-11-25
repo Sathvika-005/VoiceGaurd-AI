@@ -198,14 +198,14 @@ async def analyze(
                             gemini_mime,
                             **kwargs,
                         ),
-                        timeout=60.0,
+                        timeout=240.0,
                     )
                 except asyncio.TimeoutError:
                     res = GeminiResult(
                         status="unavailable",
                         analysis=None,
                         elapsed_ms=int((time.perf_counter() - started_g) * 1000),
-                        error_message="Gemini Native Audio timed out.",
+                        error_message="Gemini Native Audio timed out after 240 seconds.",
                     )
                 except Exception as exc:
                     logger.warning("Gemini task failed: %s", type(exc).__name__)
