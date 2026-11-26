@@ -232,6 +232,6 @@ The extension defaults to `http://localhost:3000`, so it works only when a compa
 ## Special Feature: Guardian Alert
 
 (https://github.com/tanishka08446/detect/) 
-This is a separate CMRIT × DetectifAI Hackathon prototype for scam-call defense. It combines AI-generated voice detection, transcript checks for pressure tactics such as urgency, secrecy, payment or OTP demands, and authority threats, plus optional Telegram alerts to a trusted contact. It can read safety guidance aloud in English, Hindi, or Kannada.
+It combines AI-generated voice detection, transcript checks for pressure tactics such as urgency, secrecy, payment or OTP demands, and authority threats, plus optional Telegram alerts to a trusted contact. It can read safety guidance aloud in English, Hindi, or Kannada.
 
 It complements VoiceGuard AI's focus on voice-based scam awareness, but it is maintained in its own repository and is not integrated into this project. Its README describes a Node.js server and requires a DetectifAI API key; speech transcription and Telegram alerts need their respective optional credentials. It is a hackathon prototype, and its results are evidence rather than proof that a call is safe or fraudulent.
