@@ -229,8 +229,9 @@ This repository includes the VoiceGuard AI Chrome Manifest V3 extension in [`ext
 
 The extension defaults to `http://localhost:3000`, so it works only when a compatible VoiceGuard backend is running on the same computer. To try it, follow the existing backend setup instructions above, start the backend with your own locally configured API keys, then open `chrome://extensions`, enable Developer mode, and choose **Load unpacked** with the `extension/` folder. If using the ZIP, extract it first and load the extracted folder. The ZIP does not contain API keys or a hosted backend.
 
-## Related Project: Hold On
+## Special Feature: Guardian Alert
 
-[Hold On](https://github.com/tanishka08446/detect/) is a separate CMRIT × DetectifAI Hackathon prototype for scam-call defense. It combines AI-generated voice detection, transcript checks for pressure tactics such as urgency, secrecy, payment or OTP demands, and authority threats, plus optional Telegram alerts to a trusted contact. It can read safety guidance aloud in English, Hindi, or Kannada.
+(https://github.com/tanishka08446/detect/) 
+This is a separate CMRIT × DetectifAI Hackathon prototype for scam-call defense. It combines AI-generated voice detection, transcript checks for pressure tactics such as urgency, secrecy, payment or OTP demands, and authority threats, plus optional Telegram alerts to a trusted contact. It can read safety guidance aloud in English, Hindi, or Kannada.
 
-Hold On complements VoiceGuard AI's focus on voice-based scam awareness, but it is maintained in its own repository and is not integrated into this project. Its README describes a Node.js server and requires a DetectifAI API key; speech transcription and Telegram alerts need their respective optional credentials. It is a hackathon prototype, and its results are evidence rather than proof that a call is safe or fraudulent.
+It complements VoiceGuard AI's focus on voice-based scam awareness, but it is maintained in its own repository and is not integrated into this project. Its README describes a Node.js server and requires a DetectifAI API key; speech transcription and Telegram alerts need their respective optional credentials. It is a hackathon prototype, and its results are evidence rather than proof that a call is safe or fraudulent.
