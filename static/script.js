@@ -13,6 +13,7 @@
   const audioPlayer = document.getElementById("audio-player");
   const clearBtn = document.getElementById("clear-btn");
   const analyzeBtn = document.getElementById("analyze-btn");
+  const sampleDemoBtn = document.getElementById("sample-demo-btn");
   const statusText = document.getElementById("pipeline-status-text");
   const themeToggle = document.getElementById("theme-toggle");
   const recordingVisual = document.getElementById("recording-visual");
@@ -506,6 +507,72 @@
     resultsArea.classList.remove("hidden");
   }
 
+  function showSampleDemo() {
+    resetResultsUI();
+    stepperSection.classList.remove("hidden");
+    resultsArea.classList.remove("hidden");
+    setStep(stepValidate, stepValidateMeta, "done", "Sample audio validated");
+    setStep(stepEngines, stepEnginesMeta, "done", "Illustrative sample results");
+    setStep(stepFusion, stepFusionMeta, "done", "Sample report ready");
+
+    // This fixed example demonstrates the report layout and fusion explanation.
+    // The prominent banner below makes clear that no recording or model was analyzed.
+    renderAletheia({
+      status: "ok",
+      state: "GENUINE_LIKELY",
+      raw_verdict: "real",
+      score: 0.18,
+      score_meaning: "Synthetic likelihood score (0.0 = genuine, 1.0 = synthetic)",
+      elapsed_ms: 420,
+      evidence_note: "A detection score is evidence, not proof.",
+      segments: [],
+    });
+    renderGemini({
+      status: "ok",
+      elapsed_ms: 680,
+      analysis: {
+        risk_level: "HIGH",
+        confidence: "medium",
+        speech_clarity: "clear",
+        language_detected: "English",
+        summary: "Illustrative example: a caller claims to be from a bank and pressures the listener to move money immediately.",
+        limitations: "This is a fictional sample report, not an analysis of audio.",
+        indicators: [{
+          category: "urgency_pressure",
+          severity: "high",
+          timestamp: "00:08",
+          evidence: "Move your money now or your account will be blocked.",
+          explanation: "Urgent threats that push someone to act before they can verify the caller are a common manipulation tactic.",
+        }],
+        recommended_actions: ["Hang up and contact the bank using the official number on your card."],
+      },
+    });
+    renderReport({
+      demo_sample: true,
+      audio: { filename: "illustrative-sample.wav", duration_seconds: 12 },
+      cached: false,
+      timings_ms: { total: 1100, aletheia: 420, gemini: 680 },
+      aletheia: { status: "ok" },
+      gemini: { status: "ok" },
+      fusion: {
+        threat_level: "HIGH",
+        headline: "Natural-sounding voice with suspicious content",
+        banner: "DEMO SAMPLE — illustrative example only; no audio was analyzed and no AI engines were called.",
+        reasons: [
+          "Example only: the speech sounds natural, but real voices can still be used in scams.",
+          "The fictional caller uses an urgent account-block threat to pressure the listener into moving money.",
+          "A detection score is evidence, not proof.",
+        ],
+        actions: [
+          "Hang up and contact the bank using the official number on your card.",
+          "Report suspected cyber fraud in India via helpline 1930 or cybercrime.gov.in.",
+        ],
+        partial: false,
+      },
+    });
+    statusText.textContent = "Showing illustrative sample — no audio analyzed.";
+  }
+
   async function runAnalysis() {
     if (!selectedFile) return;
     resetResultsUI();
@@ -721,6 +788,7 @@
   });
 
   analyzeBtn.addEventListener("click", runAnalysis);
+  sampleDemoBtn.addEventListener("click", showSampleDemo);
 
   recordStopBtn.addEventListener("click", async () => {
     if (activeRecState) await activeRecState.stop();

@@ -201,7 +201,7 @@ python scripts\smoke_test.py path\to\sample.wav --lang en
 | WhatsApp webhook fails to verify | Wrong verify token or old tunnel URL | Ensure Callback URL ends in `/webhook` and matches `WHATSAPP_VERIFY_TOKEN` |
 | Logs show `WhatsApp token expired/invalid` | 24-hour temporary Meta token expired | Generate a fresh token in Meta API Setup or use a permanent System User token |
 | `X-Hub-Signature-256` 403 on webhook | `WHATSAPP_APP_SECRET` mismatch | Copy the exact App Secret from Meta App Settings → Basic |
-| Gemini `429` / quota error | Free-tier rate limit reached | Wait briefly and retry; repeated identical files hit the in-memory SHA-256 cache |
+| Gemini `429` / quota error | Free-tier rate limit reached | VoiceGuard retries briefly, then tries the `gemini-3.5-flash-lite` fallback once. If quota is exhausted for both models, wait for the quota window to reset or use a Gemini API key with available quota; repeated identical files hit the in-memory SHA-256 cache |
 
 ---
 

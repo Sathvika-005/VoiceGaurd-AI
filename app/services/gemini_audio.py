@@ -257,7 +257,7 @@ def parse_and_guard_gemini_json(
     return apply_post_validation_guards(parsed)
 
 
-FALLBACK_GEMINI_MODEL = "gemini-3.6-flash"
+FALLBACK_GEMINI_MODEL = "gemini-3.5-flash-lite"
 HTTP_503_BACKOFF_SECONDS = 2.0
 
 
@@ -481,6 +481,25 @@ class GeminiAudioClient:
                             await on_retry(f"Gemini rate limited (429); retrying ({attempt}/{self.max_retries})...")
                         await asyncio.sleep(_backoff_delay(attempt - 1))
                         continue
+                    # A model-specific quota can be exhausted while another enabled
+                    # model still has capacity. Preserve the primary result path, but
+                    # make one explicit fallback attempt before reporting unavailable.
+                    if not fallback_attempted:
+                        fallback_attempted = True
+                        active_model = FALLBACK_GEMINI_MODEL
+                        # Flash-Lite handles this structured audio task without the
+                        # optional thinking setting, which older models may reject.
+                        use_thinking = False
+                        logger.warning(
+                            "Gemini quota persisted after %d retries; falling back to %s",
+                            self.max_retries,
+                            active_model,
+                        )
+                        if on_retry is not None:
+                            await on_retry(
+                                f"Gemini quota limit persisted — trying fallback model {active_model}..."
+                            )
+                        continue
                     return None, last_err
                 if code == 400 and use_thinking and "thinking" in msg_lower:
                     use_thinking = False
@@ -509,7 +528,7 @@ class GeminiAudioClient:
                     if not fallback_attempted:
                         fallback_attempted = True
                         active_model = FALLBACK_GEMINI_MODEL
-                        use_thinking = True
+                        use_thinking = False
                         logger.warning(
                             "Gemini HTTP 503 persisted after %d retries; falling back to %s",
                             self.max_retries,
