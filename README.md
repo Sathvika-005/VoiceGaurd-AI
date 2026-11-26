@@ -222,3 +222,9 @@ python scripts\smoke_test.py path\to\sample.wav --lang en
 - [ ] Recorded **2-minute demo video** following `docs/DEMO_SCRIPT.md`
 - [ ] **Mandatory Day 1 Reddit post** published using `docs/REDDIT_POST.md` (confirm the exact subreddit and post format required by the CMRIT × DetectifAI organisers)
 - [ ] **Reddit post link submitted** via the organisers' Day 1 evaluation Google Form
+
+## Chrome Extension (Local Demo)
+
+This repository includes the VoiceGuard AI Chrome Manifest V3 extension in [`extension/`](extension/). The downloadable [local demo ZIP](downloads/voiceguard-extension-local.zip) contains the same extension files. This is proof of the extension implementation and was demonstrated with the project backend running locally; it is not a publicly hosted extension service.
+
+The extension defaults to `http://localhost:3000`, so it works only when a compatible VoiceGuard backend is running on the same computer. To try it, follow the existing backend setup instructions above, start the backend with your own locally configured API keys, then open `chrome://extensions`, enable Developer mode, and choose **Load unpacked** with the `extension/` folder. If using the ZIP, extract it first and load the extracted folder. The ZIP does not contain API keys or a hosted backend.

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "VoiceGuard AI — Live Tab Audio & Call Shield",
+  "version": "1.0.0",
+  "description": "Screen real-time audio playing in Instagram, WhatsApp Web, YouTube, or browser calls with DetectifAI Aletheia + Gemini Native Audio.",
+  "permissions": [
+    "tabCapture",
+    "offscreen",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*",
+    "https://*.run.app/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "VoiceGuard AI — Screen Active Tab Audio"
+  }
+}

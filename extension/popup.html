@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceGuard AI — Tab Shield</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="popup-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12a3 3 0 0 0 6 0"></path>
+            <line x1="12" y1="7" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div>
+          <h1>VoiceGuard AI</h1>
+          <p class="subtitle">Instagram · WhatsApp Web · YouTube · Calls</p>
+        </div>
+      </div>
+      <span id="capture-timer" class="mono timer-badge hidden">00:00</span>
+    </header>
+
+    <section class="card controls-card">
+      <div class="field-row">
+        <div class="field grow">
+          <label for="backend-url-input">VoiceGuard Server URL</label>
+          <input id="backend-url-input" type="url" class="text-input mono" value="http://localhost:3000" />
+        </div>
+        <div class="field">
+          <label for="language-select">Language</label>
+          <select id="language-select">
+            <option value="en" selected>English</option>
+            <option value="auto">Auto</option>
+            <option value="hi">हिन्दी</option>
+            <option value="kn">ಕನ್ನಡ</option>
+            <option value="ta">தமிழ்</option>
+            <option value="te">తెలుగు</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button id="screen-tab-btn" type="button" class="btn btn-primary full-width">
+          Screen Active Tab Audio
+        </button>
+      </div>
+      <p id="tab-status-text" class="status-text">Ready to capture audio playing in the active tab (minimum 4 s).</p>
+    </section>
+
+    <!-- 3-Step Pipeline Progress -->
+    <section id="stepper-card" class="card stepper-card hidden">
+      <div class="stepper">
+        <div id="step-validate" class="step" data-state="idle">
+          <span class="step-num">1</span>
+          <div>
+            <div class="step-title">Validate &amp; Probe</div>
+            <div id="step-validate-meta" class="step-meta">Waiting</div>
+          </div>
+        </div>
+        <div id="step-engines" class="step" data-state="idle">
+          <span class="step-num">2</span>
+          <div>
+            <div class="step-title">Aletheia ∥ Gemini</div>
+            <div id="step-engines-meta" class="step-meta">Parallel engines</div>
+          </div>
+        </div>
+        <div id="step-fusion" class="step" data-state="idle">
+          <span class="step-num">3</span>
+          <div>
+            <div class="step-title">Explainable Fusion</div>
+            <div id="step-fusion-meta" class="step-meta">Waiting</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="error-banner" class="alert-error hidden" role="alert">
+      <strong>Screening Error:</strong>
+      <span id="error-message"></span>
+    </section>
+
+    <section id="results-area" class="results-area hidden">
+      <div id="threat-banner" class="threat-banner" data-level="UNDETERMINED">
+        <div class="threat-badge" id="threat-level-text">UNDETERMINED</div>
+        <h2 id="threat-headline" class="threat-headline">Waiting for verdict...</h2>
+      </div>
+
+      <div class="engines-stack">
+        <article class="card engine-card">
+          <div class="engine-header">
+            <span class="engine-kicker">VOICE AUTHENTICITY · ALETHEIA</span>
+            <span id="aletheia-timing" class="timing-pill mono">—</span>
+          </div>
+          <div id="aletheia-body" class="engine-body"></div>
+        </article>
+
+        <article class="card engine-card">
+          <div class="engine-header">
+            <span class="engine-kicker">COMMUNICATION RISK · GEMINI</span>
+            <span id="gemini-timing" class="timing-pill mono">—</span>
+          </div>
+          <div id="gemini-body" class="engine-body"></div>
+        </article>
+      </div>
+
+      <article id="fusion-card" class="card hidden">
+        <h3 class="section-title">Why This Rating &amp; Recommended Actions</h3>
+        <ul id="fusion-reasons" class="bullet-list"></ul>
+        <ul id="fusion-actions" class="action-list"></ul>
+      </article>
+    </section>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
